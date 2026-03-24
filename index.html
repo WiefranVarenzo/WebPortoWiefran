@@ -20,6 +20,74 @@
             display: block;
             opacity: 1;
         }
+        /* Carousel styles */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .carousel-slide {
+            min-width: 100%;
+            flex-shrink: 0;
+        }
+        .carousel-slide img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #1e293b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 2;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .carousel-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .carousel-btn.prev { left: 10px; }
+        .carousel-btn.next { right: 10px; }
+        .carousel-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .carousel-dot.active {
+            background: #3b82f6;
+            border-color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -178,6 +246,44 @@
     </div>
 
     <div id="portfolio-container" class="w-full px-4 flex flex-wrap justify-center xl:w-10/12 xl:mx-auto">
+
+        <div class="mb-12 p-4 md:w-1/2">
+        <div class="carousel-container" data-carousel>
+            <div class="carousel-track">
+                <div class="carousel-slide">
+                    <img src="src/img/portofolio/chattax_chatbot.png" alt="ChatTaxini Chatbot" />
+                </div>
+                <div class="carousel-slide">
+                    <img src="src/img/portofolio/chattax_eval.png" alt="ChatTaxini Evaluation Metrics" />
+                </div>
+            </div>
+            <button class="carousel-btn prev" data-carousel-prev>&#10094;</button>
+            <button class="carousel-btn next" data-carousel-next>&#10095;</button>
+            <div class="carousel-dots">
+                <span class="carousel-dot active" data-slide="0"></span>
+                <span class="carousel-dot" data-slide="1"></span>
+            </div>
+        </div>
+        <h3 class="font-semibold text-xl text-dark mt-5 mb-3">ChatTaxini — Tax Chatbot powered by Mistral 7B</h3>
+        <p class="font-medium text-base text-secondary">
+            Developed a lightweight yet highly accurate tax chatbot powered by Mistral 7B fine-tuned with QLoRA, combining
+            generative AI with RAG using ChromaDB and LangChain to deliver personalized answers sourced from the latest tax
+            regulation documents.
+        </p>
+        <p class="font-semibold text-base text-secondary mt-2">Tech: Mistral 7B · QLoRA · ChromaDB · LangChain · RAG</p>
+        <div class="flex flex-wrap gap-3 mt-4">
+            <a href="https://github.com/WiefranVarenzo/ChatTax" target="_blank" class="text-primary font-medium bg-primary text-white px-4 py-2 rounded-md shadow-md hover:bg-opacity-90">
+            Lihat GitHub
+            </a>
+            <a href="https://huggingface.co/Wiefdw/merged-tax-raft-mistral-7b_2/tree/main" target="_blank" class="font-medium bg-yellow-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-opacity-90">
+            🤗 HuggingFace Model
+            </a>
+            <a href="https://huggingface.co/Wiefdw/merged-tax-raft-mistral-7b_2/tree/main" target="_blank" class="font-medium bg-secondary text-white px-4 py-2 rounded-md shadow-md hover:bg-opacity-90">
+            Lihat Kode
+            </a>
+        </div>
+        </div>
+
 
         <div class="mb-12 p-4 md:w-1/2">
         <div class="rounded-md shadow-md overflow-hidden">
@@ -419,6 +525,7 @@
      <script src="dist/js/script.js" defer></script>
      <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Portfolio show/hide toggle
             const portfolioContainer = document.getElementById('portfolio-container');
             const moreButton = document.getElementById('more-button');
             const hiddenProjects = portfolioContainer.querySelectorAll('.project-hidden');
@@ -426,18 +533,41 @@
 
             moreButton.addEventListener('click', function () {
                 if (!allVisible) {
-                    // Show all hidden projects
                     hiddenProjects.forEach(project => {
                         project.classList.remove('project-hidden');
                         project.classList.add('project-visible');
                     });
-                    // Change button text and behavior
                     moreButton.textContent = 'Lihat Semua Proyek';
                     allVisible = true;
                 } else {
-                    // Redirect to a full portfolio page
-                    window.location.href = './full_portfolio.html'; // Create this page for all your projects
+                    window.location.href = './full_portfolio.html';
                 }
+            });
+
+            // Carousel logic
+            document.querySelectorAll('[data-carousel]').forEach(carousel => {
+                const track = carousel.querySelector('.carousel-track');
+                const slides = carousel.querySelectorAll('.carousel-slide');
+                const dots = carousel.querySelectorAll('.carousel-dot');
+                const prevBtn = carousel.querySelector('[data-carousel-prev]');
+                const nextBtn = carousel.querySelector('[data-carousel-next]');
+                let currentIndex = 0;
+
+                function goToSlide(index) {
+                    if (index < 0) index = slides.length - 1;
+                    if (index >= slides.length) index = 0;
+                    currentIndex = index;
+                    track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === currentIndex);
+                    });
+                }
+
+                prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+                nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+                dots.forEach(dot => {
+                    dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.slide)));
+                });
             });
         });
      </script>
